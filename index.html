@@ -162,45 +162,89 @@
     gap: 12px;
   }
   .subtype-card {
-    border: 2px solid var(--border);
+    border: 3px solid transparent;
     border-radius: var(--radius);
-    padding: 20px 14px;
     cursor: pointer;
-    text-align: center;
+    overflow: hidden;
     transition: all 0.2s;
-    background: var(--card);
+    position: relative;
+    aspect-ratio: 3/4;
+    background: #1a2033;
   }
-  .subtype-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
-  .subtype-card.selected-theropod { border-color: var(--theropod); background: #fff5f2; }
-  .subtype-card.selected-sauropod { border-color: var(--sauropod); background: #f2fbf6; }
-  .subtype-card.selected-unknown  { border-color: var(--unknown); background: #f4f6f9; }
-  .subtype-emoji { font-size: 40px; margin-bottom: 10px; display: block; }
-  .subtype-name { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
-  .subtype-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .subtype-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+  .subtype-card.selected-theropod { border-color: var(--theropod); }
+  .subtype-card.selected-sauropod { border-color: var(--sauropod); }
+  .subtype-card.selected-unknown  { border-color: var(--unknown); }
+  .subtype-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.3s;
+  }
+  .subtype-card:hover .subtype-bg { transform: scale(1.05); }
+  .subtype-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 60%);
+  }
+  .subtype-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 14px 12px;
+    color: #fff;
+  }
+  .subtype-name { font-size: 14px; font-weight: 800; margin-bottom: 4px; }
+  .subtype-desc { font-size: 11px; color: rgba(255,255,255,0.75); line-height: 1.4; }
+  .subtype-check {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: 2px solid rgba(255,255,255,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #fff;
+    transition: all 0.2s;
+  }
+  .subtype-card.selected-theropod .subtype-check { background: var(--theropod); border-color: var(--theropod); }
+  .subtype-card.selected-sauropod .subtype-check { background: var(--sauropod); border-color: var(--sauropod); }
+  .subtype-card.selected-unknown  .subtype-check { background: var(--unknown); border-color: var(--unknown); }
 
   /* ─── STEP 2: SPECIES ─── */
   .species-list { display: flex; flex-direction: column; gap: 10px; }
   .species-card {
     border: 2px solid var(--border);
     border-radius: var(--radius);
-    padding: 14px 16px;
     cursor: pointer;
     transition: all 0.2s;
     display: flex;
-    align-items: flex-start;
-    gap: 14px;
+    align-items: stretch;
+    overflow: hidden;
   }
-  .species-card:hover { border-color: var(--accent); background: #fff8f6; }
-  .species-card.selected { border-color: var(--accent); background: #fff5f2; }
-  .species-emoji { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
-  .species-info {}
+  .species-card:hover { border-color: var(--accent); box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  .species-card.selected { border-color: var(--accent); background: #fff8f6; }
+  .species-img {
+    width: 90px;
+    flex-shrink: 0;
+    background-size: cover;
+    background-position: center;
+    min-height: 80px;
+  }
+  .species-body { padding: 12px 14px; flex: 1; }
   .species-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
   .species-detail { font-size: 12px; color: var(--muted); line-height: 1.5; }
   .species-tip {
     font-size: 11px;
     background: #fff3e0;
     color: #b45309;
-    padding: 4px 10px;
+    padding: 3px 8px;
     border-radius: 20px;
     display: inline-block;
     margin-top: 6px;
@@ -553,19 +597,31 @@
 
     <div class="subtype-grid">
       <div class="subtype-card" id="sub-theropod" onclick="selectSubtype('theropod')">
-        <span class="subtype-emoji">🦖</span>
-        <div class="subtype-name">Тероподы</div>
-        <div class="subtype-desc">Перемещаются на двух ногах. Большинство — хищники.</div>
+        <div class="subtype-bg" style="background-image:url('img/p2_3_1703x1277.jpeg')"></div>
+        <div class="subtype-overlay"></div>
+        <div class="subtype-check">✓</div>
+        <div class="subtype-content">
+          <div class="subtype-name">Тероподы</div>
+          <div class="subtype-desc">На двух ногах. Большинство — хищники.</div>
+        </div>
       </div>
       <div class="subtype-card" id="sub-sauropod" onclick="selectSubtype('sauropod')">
-        <span class="subtype-emoji">🦕</span>
-        <div class="subtype-name">Завроподы</div>
-        <div class="subtype-desc">Перемещаются на четырёх ногах. Растительноядные.</div>
+        <div class="subtype-bg" style="background-image:url('img/p2_5_2564x1282.jpeg')"></div>
+        <div class="subtype-overlay"></div>
+        <div class="subtype-check">✓</div>
+        <div class="subtype-content">
+          <div class="subtype-name">Завроподы</div>
+          <div class="subtype-desc">На четырёх ногах. Растительноядные.</div>
+        </div>
       </div>
-      <div class="subtype-card" id="sub-unknown" onclick="selectSubtype('unknown')">
-        <span class="subtype-emoji">🤔</span>
-        <div class="subtype-name">Не знаю</div>
-        <div class="subtype-desc">Поможем определить подтип вместе.</div>
+      <div class="subtype-card" id="sub-unknown" onclick="selectSubtype('unknown')" style="background:#1e293b">
+        <div class="subtype-bg" style="background-image:url('img/p2_3_1703x1277.jpeg');opacity:0.25"></div>
+        <div class="subtype-overlay"></div>
+        <div class="subtype-check">✓</div>
+        <div class="subtype-content">
+          <div class="subtype-name">Не знаю</div>
+          <div class="subtype-desc">Поможем определить подтип вместе.</div>
+        </div>
       </div>
     </div>
 
@@ -746,18 +802,18 @@
   // ─── DATA ───
   const SPECIES = {
     theropod: [
-      { emoji: '🦖', name: 'Карнозавры', detail: 'Обширная клада плотоядных, возникшая в юрском периоде. Включает тираннозавридов, аллозавров.', tip: 'Охотятся на гигантов' },
-      { emoji: '🦎', name: 'Целозавры', detail: 'Небольшие двуногие динозавры, одна из древнейших групп тероподов.' },
-      { emoji: '🐊', name: 'Цератозавры', detail: 'Средние хищники с рогом на носу, длинный гибкий хвост.' },
-      { emoji: '🦈', name: 'Спинозавриды', detail: 'Полуводные хищники, самые крупные плотоядные динозавры.' },
+      { img: 'img/p5_2_642x360.jpeg', name: 'Карнозавры', detail: 'Обширная клада плотоядных, возникшая в юрском периоде. Включает тираннозавридов и аллозавров.', tip: 'Охотятся на гигантов' },
+      { img: 'img/p5_3_720x1014.jpeg', name: 'Целозавры', detail: 'Небольшие двуногие динозавры, одна из древнейших групп тероподов.' },
+      { img: 'img/p5_4_769x419.jpeg', name: 'Цератозавры', detail: 'Средние хищники с рогом на носу, длинный гибкий хвост.' },
+      { img: 'img/p5_5_240x360.jpeg', name: 'Спинозавриды', detail: 'Полуводные хищники, самые крупные плотоядные динозавры.' },
     ],
     sauropod: [
-      { emoji: '🦕', name: 'Диплодоциды', detail: 'Самые длинные сухопутные животные в истории, длина до 33 м. Питались листьями.' },
-      { emoji: '🐘', name: 'Брахиозавриды', detail: 'Высокая шея, длинные передние ноги, достигали 13 м в высоту.' },
-      { emoji: '🌿', name: 'Титанозавры', detail: 'Самая разнообразная и многочисленная группа завропод, дожили до конца мела.' },
+      { img: 'img/p2_5_2564x1282.jpeg', name: 'Диплодоциды', detail: 'Самые длинные сухопутные животные в истории, длина до 33 м. Питались листьями.' },
+      { img: 'img/p2_5_2564x1282.jpeg', name: 'Брахиозавриды', detail: 'Высокая шея, длинные передние ноги, достигали 13 м в высоту.' },
+      { img: 'img/p2_5_2564x1282.jpeg', name: 'Титанозавры', detail: 'Самая разнообразная и многочисленная группа завропод, дожили до конца мела.' },
     ],
     unknown: [
-      { emoji: '🤷', name: 'Не знаю вид', detail: 'Наш специалист поможет определить вид при первом контакте.' },
+      { img: 'img/p2_3_1703x1277.jpeg', name: 'Не знаю вид', detail: 'Наш специалист поможет определить вид при первом контакте.' },
     ],
   };
 
@@ -778,12 +834,12 @@
     const list = document.getElementById('speciesList');
     list.innerHTML = '';
     const items = SPECIES[selectedSubtype] || [];
-    items.forEach((s, i) => {
+    items.forEach((s) => {
       const div = document.createElement('div');
       div.className = 'species-card';
       div.innerHTML = `
-        <div class="species-emoji">${s.emoji}</div>
-        <div class="species-info">
+        <div class="species-img" style="background-image:url('${s.img}')"></div>
+        <div class="species-body">
           <div class="species-name">${s.name}</div>
           <div class="species-detail">${s.detail}</div>
           ${s.tip ? `<span class="species-tip">${s.tip}</span>` : ''}
