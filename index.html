@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Приют для динозавров</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f4f8;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    color: #1a1a2e;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    max-width: 620px;
+    width: 100%;
+    padding: 24px;
+  }
+
+  h1 {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 16px;
+    color: #111;
+  }
+
+  /* Category tabs */
+  .cat-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .cat-tab {
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-weight: 500;
+    transition: background .15s;
+  }
+  .cat-tab.active {
+    background: #1d4ed8;
+    color: #fff;
+  }
+  .cat-tab:hover:not(.active) { background: #bfdbfe; }
+
+  /* Top row: image + fields */
+  .top-row {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+
+  .dino-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .dino-img {
+    width: 148px;
+    height: 148px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #e0e7ef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    line-height: 1;
+    overflow: hidden;
+  }
+
+  .dino-select {
+    width: 148px;
+    padding: 6px 8px;
+    border: 1.5px solid #bfdbfe;
+    border-radius: 6px;
+    background: #eff6ff;
+    font-size: 13px;
+    color: #1d4ed8;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%231d4ed8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 24px;
+  }
+
+  .fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    flex: 1;
+  }
+
+  .field-input {
+    padding: 8px 10px;
+    border: none;
+    border-radius: 6px;
+    background: #dbeafe;
+    font-size: 13px;
+    color: #1a1a2e;
+    outline: none;
+    width: 100%;
+    transition: background .15s;
+  }
+  .field-input::placeholder { color: #64748b; }
+  .field-input:focus { background: #bfdbfe; }
+
+  /* Toggles */
+  .toggles {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 12px 0;
+  }
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+  .toggle-row input[type=checkbox] { display: none; }
+  .toggle-track {
+    width: 36px;
+    height: 20px;
+    background: #cbd5e1;
+    border-radius: 10px;
+    position: relative;
+    flex-shrink: 0;
+    transition: background .2s;
+  }
+  .toggle-track::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: left .2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  }
+  .toggle-row input:checked + .toggle-track { background: #3b82f6; }
+  .toggle-row input:checked + .toggle-track::after { left: 18px; }
+  .toggle-label { font-size: 13px; color: #374151; }
+
+  /* Description */
+  .desc-textarea {
+    width: 100%;
+    min-height: 64px;
+    padding: 10px 12px;
+    border: 1.5px solid #dbeafe;
+    border-radius: 6px;
+    background: #f8faff;
+    font-size: 13px;
+    color: #1a1a2e;
+    resize: vertical;
+    outline: none;
+    font-family: inherit;
+    margin-bottom: 16px;
+    transition: border-color .15s;
+  }
+  .desc-textarea:focus { border-color: #93c5fd; }
+  .desc-textarea::placeholder { color: #94a3b8; }
+
+  /* Divider */
+  .divider { border: none; border-top: 1px solid #e2e8f0; margin: 0 -24px 16px; }
+
+  /* Donation section */
+  .donation-title {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #374151;
+    margin-bottom: 10px;
+  }
+
+  .donation-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+  .donation-tab {
+    padding: 5px 14px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-weight: 500;
+    transition: background .15s;
+  }
+  .donation-tab.active { background: #1d4ed8; color: #fff; }
+  .donation-tab:hover:not(.active) { background: #bfdbfe; }
+
+  .donation-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .radio-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .radio-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #374151;
+  }
+  .radio-option input[type=radio] {
+    width: 16px;
+    height: 16px;
+    accent-color: #1d4ed8;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .custom-amount {
+    padding: 5px 8px;
+    border: 1.5px solid #dbeafe;
+    border-radius: 6px;
+    font-size: 13px;
+    width: 120px;
+    outline: none;
+    background: #f8faff;
+    display: none;
+  }
+  .custom-amount.visible { display: block; }
+  .custom-amount:focus { border-color: #93c5fd; }
+
+  .donation-info {
+    flex: 1;
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.5;
+  }
+  .btn-cart {
+    padding: 8px 16px;
+    background: #e91e8c;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .15s;
+    align-self: flex-end;
+  }
+  .btn-cart:hover { background: #c91578; }
+
+  /* Bottom row */
+  .bottom-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .order-input {
+    flex: 1;
+    min-width: 140px;
+    padding: 8px 10px;
+    border: 1.5px solid #dbeafe;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+    background: #f8faff;
+    transition: border-color .15s;
+  }
+  .order-input:focus { border-color: #93c5fd; }
+  .order-input::placeholder { color: #94a3b8; }
+
+  .btn-clear {
+    padding: 8px 14px;
+    background: #f1f5f9;
+    color: #475569;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background .15s;
+    white-space: nowrap;
+  }
+  .btn-clear:hover { background: #e2e8f0; }
+
+  .btn-submit {
+    padding: 8px 18px;
+    background: #e91e8c;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .15s;
+  }
+  .btn-submit:hover { background: #c91578; }
+
+  @media (max-width: 500px) {
+    .top-row { flex-direction: column; }
+    .dino-img { width: 100%; height: 180px; }
+    .dino-select { width: 100%; }
+    .fields-grid { grid-template-columns: 1fr 1fr; }
+    .donation-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Помогаем бездомным динозаврам найти небезразличных людей</h1>
+
+  <!-- Category tabs -->
+  <div class="cat-tabs">
+    <button class="cat-tab" onclick="setTab(this)">Ящеротазовые</button>
+    <button class="cat-tab active" onclick="setTab(this)">Тероподы</button>
+    <button class="cat-tab" onclick="setTab(this)">Зауроподы</button>
+    <button class="cat-tab" onclick="setTab(this)">Птицетазовые</button>
+  </div>
+
+  <!-- Top: image + fields -->
+  <div class="top-row">
+    <div class="dino-block">
+      <div class="dino-img">🦖</div>
+      <select class="dino-select" id="dinoType" onchange="updateDino()">
+        <option>Велоцираптор</option>
+        <option>Тираннозавр</option>
+        <option>Спинозавр</option>
+        <option>Дилофозавр</option>
+        <option>Карнотавр</option>
+        <option>Аллозавр</option>
+      </select>
+    </div>
+    <div class="fields-grid">
+      <input class="field-input" type="text" placeholder="Длина">
+      <input class="field-input" type="text" placeholder="Рост">
+      <input class="field-input" type="text" placeholder="Вес">
+      <input class="field-input" type="text" placeholder="Образ питания">
+      <input class="field-input" type="text" placeholder="Обитание">
+      <input class="field-input" type="text" placeholder="Меловой">
+    </div>
+  </div>
+
+  <!-- Toggles -->
+  <div class="toggles">
+    <label class="toggle-row">
+      <input type="checkbox" id="t1">
+      <div class="toggle-track"></div>
+      <span class="toggle-label">Привезу сам</span>
+    </label>
+    <label class="toggle-row">
+      <input type="checkbox" id="t2">
+      <div class="toggle-track"></div>
+      <span class="toggle-label">Надо организовать перевозку</span>
+    </label>
+  </div>
+
+  <!-- Description -->
+  <textarea class="desc-textarea" placeholder="Описание"></textarea>
+
+  <hr class="divider">
+
+  <!-- Donation -->
+  <p class="donation-title">Хочешь помочь всем динозаврам приюта? Пополни общую копилку «Срочная помощь приюту»</p>
+
+  <div class="donation-tabs">
+    <button class="donation-tab active" onclick="setDonTab(this)">Ежемесячно</button>
+    <button class="donation-tab" onclick="setDonTab(this)">Разово</button>
+  </div>
+
+  <div class="donation-row">
+    <div class="radio-list">
+      <label class="radio-option">
+        <input type="radio" name="amount" value="500" checked onchange="updateAmount(this)"> 500 рублей
+      </label>
+      <label class="radio-option">
+        <input type="radio" name="amount" value="750" onchange="updateAmount(this)"> 750 рублей
+      </label>
+      <label class="radio-option">
+        <input type="radio" name="amount" value="1000" onchange="updateAmount(this)"> 1000 рублей
+      </label>
+      <label class="radio-option">
+        <input type="radio" name="amount" value="custom" onchange="updateAmount(this)"> Введи сумму
+      </label>
+      <input class="custom-amount" id="customAmount" type="number" placeholder="Сумма" min="1">
+    </div>
+    <div class="donation-info">
+      Срочная помощь и корм для самых голодных. В середине месяца пришлют отчёт: на кого и какие услуги были потрачены средства.<br><br>
+      *Отменить подписку можно в любое время в личном кабинете или через почту hi@teddyfood.com
+    </div>
+    <button class="btn-cart">В корзину</button>
+  </div>
+
+  <!-- Bottom row -->
+  <div class="bottom-row">
+    <input class="order-input" type="text" placeholder="Номер заявки*">
+    <button class="btn-clear" onclick="clearForm()">Очистить поле</button>
+    <button class="btn-submit">Отправить заявку</button>
+  </div>
+</div>
+
+<script>
+  const dinoEmojis = {
+    'Велоцираптор': '🦖',
+    'Тираннозавр': '🦕',
+    'Спинозавр': '🦎',
+    'Дилофозавр': '🦖',
+    'Карнотавр': '🦕',
+    'Аллозавр': '🦖',
+  };
+
+  function setTab(btn) {
+    btn.closest('.cat-tabs').querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function setDonTab(btn) {
+    btn.closest('.donation-tabs').querySelectorAll('.donation-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function updateDino() {
+    const sel = document.getElementById('dinoType');
+    const img = sel.closest('.dino-block').querySelector('.dino-img');
+    img.textContent = dinoEmojis[sel.value] || '🦖';
+  }
+
+  function updateAmount(radio) {
+    const custom = document.getElementById('customAmount');
+    custom.classList.toggle('visible', radio.value === 'custom');
+  }
+
+  function clearForm() {
+    document.querySelector('.order-input').value = '';
+  }
+
+  // Toggle mutual exclusivity
+  document.getElementById('t1').addEventListener('change', function() {
+    if (this.checked) document.getElementById('t2').checked = false;
+  });
+  document.getElementById('t2').addEventListener('change', function() {
+    if (this.checked) document.getElementById('t1').checked = false;
+  });
+</script>
+</body>
+</html>
