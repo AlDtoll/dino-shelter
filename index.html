@@ -5,601 +5,923 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Приют для динозавров</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    background: #f0f4f8;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: 14px;
-    color: #1a1a2e;
-    min-height: 100vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 32px 16px;
+  :root {
+    --theropod: #e05c3a;
+    --sauropod: #3a9e6f;
+    --unknown: #7a8fa6;
+    --accent: #e05c3a;
+    --bg: #f4f5f7;
+    --card: #fff;
+    --text: #1a2033;
+    --muted: #6b7a99;
+    --border: #e2e6ee;
+    --step-done: #3a9e6f;
+    --radius: 10px;
   }
 
+  body {
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 48px;
+  }
+
+  /* ─── NAV BAR ─── */
+  .top-bar {
+    width: 100%;
+    max-width: 640px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .logo {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo span { font-size: 22px; }
+  .nav-home {
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+  }
+  .nav-home:hover { color: var(--accent); }
+
+  /* ─── HERO ─── */
+  .hero {
+    width: 100%;
+    max-width: 640px;
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .hero h1 {
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.3;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .hero p { font-size: 14px; color: var(--muted); }
+
+  /* ─── CARD ─── */
   .card {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    background: var(--card);
+    border-radius: 16px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.08);
     max-width: 640px;
     width: 100%;
     overflow: hidden;
   }
 
-  .card-header {
-    padding: 24px 24px 0;
-  }
-
-  h1 {
-    font-size: 18px;
-    font-weight: 700;
-    line-height: 1.4;
-    margin-bottom: 16px;
-    color: #111;
-  }
-
-  /* Section label */
-  .section-label {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: #94a3b8;
-    margin-bottom: 10px;
-  }
-
-  /* Category tabs */
-  .cat-tabs {
+  /* ─── STEP INDICATOR ─── */
+  .steps-bar {
     display: flex;
-    gap: 4px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
+    align-items: center;
+    padding: 20px 24px 0;
+    gap: 0;
+    margin-bottom: 28px;
   }
-  .cat-tab {
-    padding: 6px 14px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    font-size: 13px;
-    background: #dbeafe;
-    color: #1d4ed8;
-    font-weight: 500;
-    transition: background .15s;
-  }
-  .cat-tab.active { background: #1d4ed8; color: #fff; }
-  .cat-tab:hover:not(.active) { background: #bfdbfe; }
-
-  /* Top row */
-  .top-row {
+  .step-item {
     display: flex;
-    gap: 16px;
-    margin-bottom: 20px;
-    padding: 0 24px;
-  }
-
-  .dino-block {
-    display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 8px;
-    flex-shrink: 0;
+    flex: 1;
   }
-
-  .dino-img {
-    width: 148px;
-    height: 148px;
-    border-radius: 10px;
-    background: #e0e7ef;
+  .step-item:last-child { flex: 0; }
+  .step-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--card);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 64px;
-    line-height: 1;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+  .step-circle.done { background: var(--step-done); border-color: var(--step-done); color: #fff; }
+  .step-circle.active { border-color: var(--accent); color: var(--accent); }
+  .step-line {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    margin: 0 4px;
+    transition: background 0.3s;
+  }
+  .step-line.done { background: var(--step-done); }
+  .step-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 4px;
+    display: none;
   }
 
+  /* ─── STEP PANELS ─── */
+  .step-panel { display: none; padding: 0 24px 28px; }
+  .step-panel.active { display: block; }
+
+  .step-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .step-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  /* ─── STEP 1: SUBTYPE CARDS ─── */
+  .subtype-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+  .subtype-card {
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 14px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    background: var(--card);
+  }
+  .subtype-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  .subtype-card.selected-theropod { border-color: var(--theropod); background: #fff5f2; }
+  .subtype-card.selected-sauropod { border-color: var(--sauropod); background: #f2fbf6; }
+  .subtype-card.selected-unknown  { border-color: var(--unknown); background: #f4f6f9; }
+  .subtype-emoji { font-size: 40px; margin-bottom: 10px; display: block; }
+  .subtype-name { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .subtype-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+
+  /* ─── STEP 2: SPECIES ─── */
+  .species-list { display: flex; flex-direction: column; gap: 10px; }
+  .species-card {
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .species-card:hover { border-color: var(--accent); background: #fff8f6; }
+  .species-card.selected { border-color: var(--accent); background: #fff5f2; }
+  .species-emoji { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+  .species-info {}
+  .species-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .species-detail { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .species-tip {
+    font-size: 11px;
+    background: #fff3e0;
+    color: #b45309;
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-top: 6px;
+    font-weight: 600;
+  }
+
+  /* ─── STEP 3: PARAMS ─── */
+  .field-group { margin-bottom: 16px; }
   .field-label {
     display: block;
     font-size: 12px;
-    font-weight: 500;
-    color: #475569;
-    margin-bottom: 4px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
   }
-
-  .select-wrap { position: relative; }
-  .select-wrap select {
-    width: 148px;
-    padding: 8px 28px 8px 10px;
-    border: 1.5px solid #bfdbfe;
-    border-radius: 6px;
-    background: #eff6ff;
-    font-size: 13px;
-    color: #1d4ed8;
-    font-weight: 500;
-    cursor: pointer;
-    appearance: none;
-    outline: none;
-  }
-  .select-wrap::after {
-    content: '';
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 0; height: 0;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-top: 5px solid #1d4ed8;
-    pointer-events: none;
-  }
-
-  /* Fields grid */
-  .fields-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px;
-    flex: 1;
-  }
-
-  .field-group { display: flex; flex-direction: column; }
-
-  .input-with-unit {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-  .field-input {
-    width: 100%;
-    padding: 8px 10px;
-    border: none;
-    border-radius: 6px;
-    background: #dbeafe;
-    font-size: 13px;
-    color: #1a1a2e;
-    outline: none;
-    transition: background .15s;
-  }
-  .field-input::placeholder { color: #94a3b8; }
-  .field-input:focus { background: #bfdbfe; }
-  .field-input.has-unit { padding-right: 32px; }
-
-  .unit {
-    position: absolute;
-    right: 8px;
+  .field-hint {
     font-size: 11px;
-    color: #64748b;
-    font-weight: 500;
-    pointer-events: none;
+    color: #94a3b8;
+    margin-bottom: 6px;
   }
-
-  .select-field {
+  .field-input, .field-select, .field-textarea {
     width: 100%;
-    padding: 8px 28px 8px 10px;
-    border: none;
-    border-radius: 6px;
-    background: #dbeafe;
-    font-size: 13px;
-    color: #1a1a2e;
-    cursor: pointer;
-    appearance: none;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text);
+    font-family: inherit;
     outline: none;
-    transition: background .15s;
+    background: #fafbfc;
+    transition: border-color 0.15s;
+    appearance: none;
   }
-  .select-field:focus { background: #bfdbfe; }
+  .field-input:focus, .field-select:focus, .field-textarea:focus { border-color: var(--accent); background: #fff; }
+  .field-input::placeholder, .field-textarea::placeholder { color: #bcc5d6; }
 
-  /* Fields section */
-  .fields-section {
-    padding: 0 24px 20px;
+  .fields-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
   }
 
-  /* Toggles */
-  .toggles-section {
-    padding: 0 24px 20px;
+  /* Slider + input combo */
+  .slider-combo { display: flex; align-items: center; gap: 10px; }
+  .slider-combo input[type=range] {
+    flex: 1;
+    accent-color: var(--accent);
+    cursor: pointer;
   }
-  .toggles { display: flex; flex-direction: column; gap: 10px; }
-  .toggle-row {
+  .slider-val {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .slider-val input {
+    width: 64px;
+    padding: 6px 8px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    text-align: center;
+    outline: none;
+    background: #fafbfc;
+  }
+  .slider-val input:focus { border-color: var(--accent); }
+  .slider-val span { font-size: 12px; color: var(--muted); }
+
+  /* Photo upload */
+  .photo-drop {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fafbfc;
+  }
+  .photo-drop:hover { border-color: var(--accent); background: #fff5f2; }
+  .photo-drop-icon { font-size: 28px; margin-bottom: 8px; }
+  .photo-drop-text { font-size: 13px; color: var(--muted); }
+  .photo-drop-sub { font-size: 11px; color: #bcc5d6; margin-top: 4px; }
+  .photo-drop input[type=file] { display: none; }
+
+  /* Char counter */
+  .textarea-wrap { position: relative; }
+  .char-counter {
+    position: absolute;
+    bottom: 8px;
+    right: 10px;
+    font-size: 11px;
+    color: #bcc5d6;
+  }
+  .field-textarea { padding-bottom: 26px; min-height: 90px; resize: vertical; }
+
+  /* Checkbox */
+  .check-row {
     display: flex;
     align-items: center;
     gap: 10px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
     cursor: pointer;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
   }
-  .toggle-row input[type=checkbox] { display: none; }
-  .toggle-track {
-    width: 36px;
-    height: 20px;
-    background: #cbd5e1;
-    border-radius: 10px;
-    position: relative;
-    flex-shrink: 0;
-    transition: background .2s;
-  }
-  .toggle-track::after {
-    content: '';
-    position: absolute;
-    width: 16px; height: 16px;
-    background: #fff;
-    border-radius: 50%;
-    top: 2px; left: 2px;
-    transition: left .2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,.2);
-  }
-  .toggle-row input:checked + .toggle-track { background: #3b82f6; }
-  .toggle-row input:checked + .toggle-track::after { left: 18px; }
-  .toggle-label { font-size: 13px; color: #374151; }
+  .check-row:hover { border-color: var(--accent); }
+  .check-row input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+  .check-row-label { font-size: 14px; color: var(--text); }
+  .check-row-sub { font-size: 12px; color: var(--muted); }
 
-  /* Description */
-  .desc-section { padding: 0 24px 24px; }
-  .desc-textarea {
-    width: 100%;
-    min-height: 72px;
-    padding: 10px 12px;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 6px;
-    background: #f8faff;
-    font-size: 13px;
-    color: #1a1a2e;
-    resize: vertical;
-    outline: none;
-    font-family: inherit;
-    line-height: 1.5;
-    transition: border-color .15s;
+  /* Help link */
+  .help-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--accent);
+    cursor: pointer;
+    margin-top: 4px;
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
-  .desc-textarea:focus { border-color: #93c5fd; }
-  .desc-textarea::placeholder { color: #94a3b8; }
 
-  /* Submit section */
-  .submit-section {
+  /* ─── STEP 4: SUCCESS ─── */
+  .success-block {
+    text-align: center;
+    padding: 12px 0 8px;
+  }
+  .success-icon { font-size: 56px; margin-bottom: 12px; }
+  .success-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+  .success-sub { font-size: 14px; color: var(--muted); margin-bottom: 6px; line-height: 1.5; }
+  .case-number {
+    display: inline-block;
+    background: #f0f9f4;
+    border: 1.5px solid #a7f3d0;
+    color: #065f46;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 8px 20px;
+    border-radius: 8px;
+    margin: 8px 0 20px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── SUBSCRIPTION BLOCK ─── */
+  .sub-block {
+    background: #f8f9fb;
+    border-top: 2px solid var(--border);
     padding: 20px 24px 24px;
-    border-top: 1px solid #e2e8f0;
+  }
+  .sub-block-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .sub-block-desc { font-size: 13px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+  .sub-perks { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .sub-perk {
     display: flex;
     align-items: center;
     gap: 8px;
-    flex-wrap: wrap;
-  }
-  .order-input {
-    flex: 1;
-    min-width: 140px;
-    padding: 10px 12px;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 6px;
     font-size: 13px;
-    outline: none;
-    background: #f8faff;
-    transition: border-color .15s;
+    color: var(--text);
   }
-  .order-input:focus { border-color: #93c5fd; }
-  .order-input::placeholder { color: #94a3b8; }
-  .required-star { color: #e91e8c; }
-
-  .btn-clear {
-    padding: 10px 14px;
-    background: #f1f5f9;
-    color: #475569;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 6px;
-    font-size: 13px;
+  .sub-perk::before { content: '✓'; color: var(--step-done); font-weight: 700; font-size: 14px; }
+  .sub-plans {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .sub-plan {
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
     cursor: pointer;
-    transition: background .15s;
-    white-space: nowrap;
+    transition: all 0.2s;
+    position: relative;
   }
-  .btn-clear:hover { background: #e2e8f0; }
-
-  .btn-submit {
-    padding: 10px 20px;
-    background: #e91e8c;
+  .sub-plan:hover { border-color: var(--accent); }
+  .sub-plan.active { border-color: var(--accent); background: #fff5f2; }
+  .sub-plan-name { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .sub-plan-price { font-size: 18px; font-weight: 800; color: var(--text); }
+  .sub-plan-period { font-size: 12px; color: var(--muted); }
+  .sub-plan-badge {
+    position: absolute;
+    top: -8px;
+    right: 10px;
+    background: var(--step-done);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .btn-sub {
+    width: 100%;
+    padding: 13px;
+    background: var(--accent);
     color: #fff;
     border: none;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
     cursor: pointer;
-    white-space: nowrap;
-    transition: background .15s;
+    transition: background 0.2s;
+    margin-bottom: 8px;
   }
-  .btn-submit:hover { background: #c91578; }
+  .btn-sub:hover { background: #c04420; }
+  .sub-cancel { font-size: 12px; color: var(--muted); text-align: center; }
 
-  /* Donation card — separate visually */
-  .donation-card {
+  /* ─── DONATION BLOCK ─── */
+  .donation-block {
     background: #f0f9ff;
     border-top: 2px solid #bae6fd;
     padding: 20px 24px 24px;
   }
-  .donation-card h2 {
-    font-size: 14px;
-    font-weight: 700;
-    color: #0369a1;
-    margin-bottom: 4px;
-  }
-  .donation-sub {
-    font-size: 12px;
-    color: #64748b;
+  .donation-title { font-size: 14px; font-weight: 700; color: #0369a1; margin-bottom: 4px; }
+  .donation-desc { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+  .donation-amounts {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
     margin-bottom: 12px;
-    line-height: 1.5;
   }
-
-  .donation-tabs {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 14px;
-  }
-  .donation-tab {
-    padding: 5px 14px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    font-size: 13px;
-    background: #bae6fd;
-    color: #0369a1;
-    font-weight: 500;
-    transition: background .15s;
-  }
-  .donation-tab.active { background: #0369a1; color: #fff; }
-  .donation-tab:hover:not(.active) { background: #7dd3fc; }
-
-  .donation-body {
-    display: flex;
-    gap: 16px;
-    align-items: flex-start;
-  }
-  .radio-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    flex-shrink: 0;
-  }
-  .radio-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    color: #374151;
-  }
-  .radio-option input[type=radio] {
-    width: 16px; height: 16px;
-    accent-color: #0369a1;
-    cursor: pointer;
-  }
-  .custom-amount {
-    padding: 6px 8px;
+  .amount-btn {
+    padding: 7px 16px;
     border: 1.5px solid #bae6fd;
-    border-radius: 6px;
-    font-size: 13px;
-    width: 120px;
-    outline: none;
+    border-radius: 20px;
     background: #fff;
-    display: none;
-  }
-  .custom-amount.visible { display: block; }
-  .custom-amount:focus { border-color: #7dd3fc; }
-
-  .donation-info-col {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .donation-info {
-    font-size: 12px;
-    color: #64748b;
-    line-height: 1.5;
-  }
-  .btn-cart {
-    padding: 8px 16px;
-    background: #e91e8c;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
     font-size: 13px;
     font-weight: 600;
+    color: #0369a1;
     cursor: pointer;
-    align-self: flex-start;
-    transition: background .15s;
+    transition: all 0.15s;
   }
-  .btn-cart:hover { background: #c91578; }
+  .amount-btn.active, .amount-btn:hover { background: #0369a1; color: #fff; border-color: #0369a1; }
+  .btn-donate {
+    padding: 10px 24px;
+    background: #0ea5e9;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-donate:hover { background: #0284c7; }
+
+  /* ─── FOOTER BUTTONS ─── */
+  .step-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 24px 24px;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+  }
+  .btn-back {
+    padding: 11px 20px;
+    background: #f1f5f9;
+    color: var(--muted);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-back:hover { background: #e2e8f0; }
+  .btn-next {
+    flex: 1;
+    padding: 12px 20px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-next:hover { background: #c04420; }
+  .btn-next:disabled { background: #d1d9e6; cursor: not-allowed; }
+  .spacer { flex: 1; }
+
+  /* ─── HELP BLOCK ─── */
+  .help-bottom {
+    text-align: center;
+    padding: 16px 24px 0;
+    margin-top: 4px;
+  }
+  .help-bottom p { font-size: 13px; color: var(--muted); }
+  .help-bottom a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  .help-bottom a:hover { text-decoration: underline; }
 
   @media (max-width: 520px) {
-    .top-row { flex-direction: column; padding: 0 16px; }
-    .dino-img { width: 100%; height: 180px; }
-    .select-wrap select { width: 100%; }
-    .fields-grid { grid-template-columns: 1fr 1fr; }
-    .donation-body { flex-direction: column; }
-    .card-header, .fields-section, .toggles-section,
-    .desc-section, .submit-section, .donation-card { padding-left: 16px; padding-right: 16px; }
+    .subtype-grid { grid-template-columns: 1fr; gap: 10px; }
+    .fields-row { grid-template-columns: 1fr; }
+    .sub-plans { grid-template-columns: 1fr; }
+    .step-panel, .step-nav { padding-left: 16px; padding-right: 16px; }
+    .steps-bar { padding: 16px 16px 0; }
+    .sub-block, .donation-block { padding-left: 16px; padding-right: 16px; }
+    .hero h1 { font-size: 18px; }
   }
 </style>
 </head>
 <body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="logo"><span>🦕</span> Приют для динозавров</div>
+  <a href="#" class="nav-home">← На главную</a>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Бездомным динозаврам нужна ваша помощь</h1>
+  <p>Поможем на всех этапах оформления — заполните форму за 3 шага</p>
+</div>
+
+<!-- CARD -->
 <div class="card">
-  <div class="card-header">
-    <h1>Помогаем бездомным динозаврам найти небезразличных людей</h1>
 
-    <p class="section-label">Отряд</p>
-    <div class="cat-tabs">
-      <button class="cat-tab" onclick="setTab(this)">Ящеротазовые</button>
-      <button class="cat-tab active" onclick="setTab(this)">Тероподы</button>
-      <button class="cat-tab" onclick="setTab(this)">Зауроподы</button>
-      <button class="cat-tab" onclick="setTab(this)">Птицетазовые</button>
+  <!-- STEPS BAR -->
+  <div class="steps-bar" id="stepsBar">
+    <div class="step-item">
+      <div class="step-circle active" id="sc1">1</div>
+    </div>
+    <div class="step-line" id="sl1"></div>
+    <div class="step-item">
+      <div class="step-circle" id="sc2">2</div>
+    </div>
+    <div class="step-line" id="sl2"></div>
+    <div class="step-item">
+      <div class="step-circle" id="sc3">3</div>
+    </div>
+    <div class="step-line" id="sl3"></div>
+    <div class="step-item">
+      <div class="step-circle" id="sc4">✓</div>
     </div>
   </div>
 
-  <!-- Image + fields -->
-  <div class="top-row">
-    <div class="dino-block">
-      <div class="dino-img" id="dinoImg">🦖</div>
+  <!-- ── STEP 1: SUBTYPE ── -->
+  <div class="step-panel active" id="step1">
+    <div class="step-title">Выберите подтип динозавра</div>
+    <div class="step-subtitle">Если не знаете точно — выберите «Не знаю», мы поможем определить.</div>
+
+    <div class="subtype-grid">
+      <div class="subtype-card" id="sub-theropod" onclick="selectSubtype('theropod')">
+        <span class="subtype-emoji">🦖</span>
+        <div class="subtype-name">Тероподы</div>
+        <div class="subtype-desc">Перемещаются на двух ногах. Большинство — хищники.</div>
+      </div>
+      <div class="subtype-card" id="sub-sauropod" onclick="selectSubtype('sauropod')">
+        <span class="subtype-emoji">🦕</span>
+        <div class="subtype-name">Завроподы</div>
+        <div class="subtype-desc">Перемещаются на четырёх ногах. Растительноядные.</div>
+      </div>
+      <div class="subtype-card" id="sub-unknown" onclick="selectSubtype('unknown')">
+        <span class="subtype-emoji">🤔</span>
+        <div class="subtype-name">Не знаю</div>
+        <div class="subtype-desc">Поможем определить подтип вместе.</div>
+      </div>
+    </div>
+
+    <div class="help-bottom">
+      <p>Затрудняетесь? <a href="#">Вызвать специалиста</a></p>
+    </div>
+  </div>
+
+  <!-- ── STEP 2: SPECIES ── -->
+  <div class="step-panel" id="step2">
+    <div class="step-title" id="step2Title">Выберите вид динозавра</div>
+    <div class="step-subtitle" id="step2Sub">Выберите наиболее подходящий вид из списка.</div>
+
+    <div class="species-list" id="speciesList"></div>
+
+    <div class="help-bottom">
+      <p>Не нашли подходящий вариант? <a href="#">Напишите нам</a></p>
+    </div>
+  </div>
+
+  <!-- ── STEP 3: PARAMS ── -->
+  <div class="step-panel" id="step3">
+    <div class="step-title">Укажите параметры динозавра</div>
+    <div class="step-subtitle">Если не знаете какой-то параметр — оставьте пустым. Можем прислать специалиста для замеров.</div>
+
+    <!-- Photo -->
+    <div class="field-group">
+      <label class="field-label">Фото</label>
+      <div class="photo-drop" onclick="document.getElementById('photoInput').click()">
+        <input type="file" id="photoInput" accept="image/*" onchange="handlePhoto(this)">
+        <div class="photo-drop-icon" id="photoIcon">📷</div>
+        <div class="photo-drop-text" id="photoText">Перетащите сюда файл или загрузите вручную</div>
+        <div class="photo-drop-sub" id="photoSub">JPG, PNG — до 10 МБ</div>
+      </div>
+    </div>
+
+    <!-- Period + Diet row -->
+    <div class="fields-row">
+      <div class="field-group" style="margin:0">
+        <label class="field-label">Период</label>
+        <select class="field-select" id="period">
+          <option value="">Выберите...</option>
+          <option value="cretaceous">Меловой</option>
+          <option value="jurassic">Юрский</option>
+          <option value="triassic">Триасовый</option>
+        </select>
+      </div>
+      <div class="field-group" style="margin:0">
+        <label class="field-label">Тип питания</label>
+        <select class="field-select" id="diet">
+          <option value="">Выберите...</option>
+          <option value="carnivore">Хищник</option>
+          <option value="herbivore">Травоядный</option>
+          <option value="omnivore">Всеядный</option>
+          <option value="piscivore">Рыбоядный</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Length slider -->
+    <div class="field-group">
+      <label class="field-label">Длина</label>
+      <div class="help-link" onclick="toggleHelp('helpLength')">? Как правильно измерять</div>
+      <div id="helpLength" style="display:none;font-size:12px;color:var(--muted);margin:6px 0 8px;padding:8px 12px;background:#f8f9fb;border-radius:6px;line-height:1.5">Измеряйте от кончика носа до кончика хвоста по прямой линии.</div>
+      <div class="slider-combo">
+        <input type="range" min="50" max="3000" value="240" id="lengthRange" oninput="syncSlider('lengthRange','lengthInput')">
+        <div class="slider-val">
+          <input type="number" id="lengthInput" value="240" min="50" max="3000" oninput="syncInput('lengthInput','lengthRange')">
+          <span>см</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Height slider -->
+    <div class="field-group">
+      <label class="field-label">Рост</label>
+      <div class="slider-combo">
+        <input type="range" min="30" max="1500" value="120" id="heightRange" oninput="syncSlider('heightRange','heightInput')">
+        <div class="slider-val">
+          <input type="number" id="heightInput" value="120" min="30" max="1500" oninput="syncInput('heightInput','heightRange')">
+          <span>см</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Habitat -->
+    <div class="field-group">
+      <label class="field-label">Среда обитания</label>
+      <input class="field-input" type="text" id="habitat" placeholder="Город, адрес или тип местности...">
+    </div>
+
+    <!-- Description -->
+    <div class="field-group">
+      <label class="field-label">Описание</label>
+      <div class="textarea-wrap">
+        <textarea class="field-textarea" id="description" maxlength="1000" placeholder="Характер, особенности, история — всё, что поможет найти хозяина" oninput="updateCharCount()"></textarea>
+        <span class="char-counter" id="charCount">0/1000</span>
+      </div>
+    </div>
+
+    <!-- Transport checkbox -->
+    <label class="check-row">
+      <input type="checkbox" id="needTransport">
       <div>
-        <label class="field-label">Вид</label>
-        <div class="select-wrap">
-          <select id="dinoType" onchange="updateDino()">
-            <option>Велоцираптор</option>
-            <option>Тираннозавр</option>
-            <option>Спинозавр</option>
-            <option>Дилофозавр</option>
-            <option>Карнотавр</option>
-            <option>Аллозавр</option>
-          </select>
-        </div>
+        <div class="check-row-label">Необходима организация перевозки</div>
+        <div class="check-row-sub">Мы свяжемся для уточнения деталей</div>
       </div>
-    </div>
+    </label>
 
-    <div class="fields-grid">
-      <div class="field-group">
-        <label class="field-label">Длина</label>
-        <div class="input-with-unit">
-          <input class="field-input has-unit" type="number" min="0" step="0.1" placeholder="0.0">
-          <span class="unit">м</span>
-        </div>
-      </div>
-      <div class="field-group">
-        <label class="field-label">Рост</label>
-        <div class="input-with-unit">
-          <input class="field-input has-unit" type="number" min="0" step="0.1" placeholder="0.0">
-          <span class="unit">м</span>
-        </div>
-      </div>
-      <div class="field-group">
-        <label class="field-label">Вес</label>
-        <div class="input-with-unit">
-          <input class="field-input has-unit" type="number" min="0" step="0.1" placeholder="0.0">
-          <span class="unit">кг</span>
-        </div>
-      </div>
-      <div class="field-group">
-        <label class="field-label">Образ питания</label>
-        <div class="select-wrap" style="--arrow-color:#1a1a2e">
-          <select class="select-field">
-            <option value="">Выбери...</option>
-            <option>Хищник</option>
-            <option>Травоядный</option>
-            <option>Всеядный</option>
-            <option>Рыбоядный</option>
-          </select>
-        </div>
-      </div>
-      <div class="field-group">
-        <label class="field-label">Обитание</label>
-        <div class="select-wrap">
-          <select class="select-field">
-            <option value="">Выбери...</option>
-            <option>Лес</option>
-            <option>Болото</option>
-            <option>Степь</option>
-            <option>Прибрежная зона</option>
-            <option>Горы</option>
-          </select>
-        </div>
-      </div>
-      <div class="field-group">
-        <label class="field-label">Эпоха</label>
-        <div class="select-wrap">
-          <select class="select-field">
-            <option value="">Выбери...</option>
-            <option>Меловой период</option>
-            <option>Юрский период</option>
-            <option>Триасовый период</option>
-          </select>
-        </div>
-      </div>
+    <!-- Contacts -->
+    <div class="field-group">
+      <label class="field-label">Контактные данные <span style="color:#e05c3a">*</span></label>
+      <div class="field-hint">Достаточно указать одно — email или телефон</div>
+      <input class="field-input" type="text" id="contact" placeholder="Email или номер телефона">
     </div>
   </div>
 
-  <!-- Toggles -->
-  <div class="toggles-section">
-    <p class="section-label">Доставка</p>
-    <div class="toggles">
-      <label class="toggle-row">
-        <input type="checkbox" id="t1">
-        <div class="toggle-track"></div>
-        <span class="toggle-label">Привезу сам</span>
-      </label>
-      <label class="toggle-row">
-        <input type="checkbox" id="t2">
-        <div class="toggle-track"></div>
-        <span class="toggle-label">Нужна организация перевозки</span>
-      </label>
+  <!-- ── STEP 4: SUCCESS ── -->
+  <div class="step-panel" id="step4">
+    <div class="success-block">
+      <div class="success-icon">🦕</div>
+      <div class="success-title">Спасибо!</div>
+      <div class="success-sub">Ваша заявка принята. Мы отправили номер заявки на ваш контакт.</div>
+      <div class="case-number" id="caseNumber">#000000</div>
+      <div class="success-sub">В ближайшее время мы свяжемся с вами для уточнения деталей.</div>
     </div>
   </div>
 
-  <!-- Description -->
-  <div class="desc-section">
-    <label class="field-label">Описание динозавра</label>
-    <textarea class="desc-textarea" placeholder="Характер, особенности поведения, история — всё, что поможет найти хорошего хозяина"></textarea>
+  <!-- ── NAVIGATION ── -->
+  <div class="step-nav" id="stepNav">
+    <button class="btn-back" id="btnBack" onclick="prevStep()" style="display:none">← Назад</button>
+    <div class="spacer" id="spacer"></div>
+    <button class="btn-next" id="btnNext" onclick="nextStep()" disabled>Далее →</button>
   </div>
+</div>
 
-  <!-- Submit -->
-  <div class="submit-section">
-    <div style="flex:1;min-width:140px">
-      <label class="field-label">Номер заявки <span class="required-star">*</span></label>
-      <input class="order-input" style="width:100%" type="text" placeholder="Введи номер">
+<!-- SUBSCRIPTION BLOCK (shown after step 4) -->
+<div class="card" id="subCard" style="display:none;margin-top:16px">
+  <div class="sub-block">
+    <div class="sub-block-title">Хотите помочь проекту?</div>
+    <div class="sub-block-desc">Оформите подписку — первыми узнавайте новости и получайте фото наших красавцев.</div>
+    <div class="sub-perks">
+      <div class="sub-perk">Новости приюта</div>
+      <div class="sub-perk">Информационные статьи</div>
+      <div class="sub-perk">Новые фото динозавров</div>
     </div>
-    <button class="btn-clear" onclick="clearForm()" style="align-self:flex-end">Очистить</button>
-    <button class="btn-submit" style="align-self:flex-end">Сдать динозавра в приют</button>
-  </div>
-
-  <!-- Donation — visually separated -->
-  <div class="donation-card">
-    <h2>Срочная помощь приюту 🦕</h2>
-    <p class="donation-sub">Хочешь помочь всем динозаврам? Пополни общую копилку — корм для самых голодных.</p>
-
-    <div class="donation-tabs">
-      <button class="donation-tab active" onclick="setDonTab(this)">Ежемесячно</button>
-      <button class="donation-tab" onclick="setDonTab(this)">Разово</button>
-    </div>
-
-    <div class="donation-body">
-      <div class="radio-list">
-        <label class="radio-option">
-          <input type="radio" name="amount" value="500" checked onchange="updateAmount(this)"> 500 ₽
-        </label>
-        <label class="radio-option">
-          <input type="radio" name="amount" value="750" onchange="updateAmount(this)"> 750 ₽
-        </label>
-        <label class="radio-option">
-          <input type="radio" name="amount" value="1000" onchange="updateAmount(this)"> 1 000 ₽
-        </label>
-        <label class="radio-option">
-          <input type="radio" name="amount" value="custom" onchange="updateAmount(this)"> Своя сумма
-        </label>
-        <input class="custom-amount" id="customAmount" type="number" placeholder="Сумма, ₽" min="1">
+    <div class="sub-plans">
+      <div class="sub-plan" id="plan-month" onclick="selectPlan('month')">
+        <div class="sub-plan-name">Ежемесячно</div>
+        <div class="sub-plan-price">120 ₽</div>
+        <div class="sub-plan-period">/ месяц</div>
       </div>
-
-      <div class="donation-info-col">
-        <p class="donation-info">В середине месяца пришлём отчёт: на кого и какие услуги были потрачены средства.<br><br>Отменить подписку можно в любое время в личном кабинете или по почте hi@teddyfood.com</p>
-        <button class="btn-cart">Поддержать приют</button>
+      <div class="sub-plan" id="plan-year" onclick="selectPlan('year')">
+        <div class="sub-plan-badge">−20%</div>
+        <div class="sub-plan-name">Годовая</div>
+        <div class="sub-plan-price">1 152 ₽</div>
+        <div class="sub-plan-period">/ год (96 ₽/мес)</div>
       </div>
     </div>
+    <button class="btn-sub">Оформить подписку</button>
+    <div class="sub-cancel">Отменить можно в любое время</div>
+  </div>
+
+  <div class="donation-block">
+    <div class="donation-title">Срочная помощь приюту</div>
+    <div class="donation-desc">Пополни общую копилку — корм для самых голодных. В середине месяца пришлём отчёт.</div>
+    <div class="donation-amounts">
+      <button class="amount-btn" onclick="selectAmount(this)">200 ₽</button>
+      <button class="amount-btn active" onclick="selectAmount(this)">500 ₽</button>
+      <button class="amount-btn" onclick="selectAmount(this)">1 000 ₽</button>
+      <button class="amount-btn" onclick="selectAmount(this)">Своя сумма</button>
+    </div>
+    <button class="btn-donate">Пополнить копилку</button>
   </div>
 </div>
 
 <script>
-  const dinoEmojis = {
-    'Велоцираптор':'🦖','Тираннозавр':'🦕','Спинозавр':'🦎',
-    'Дилофозавр':'🦖','Карнотавр':'🦕','Аллозавр':'🦖'
+  // ─── DATA ───
+  const SPECIES = {
+    theropod: [
+      { emoji: '🦖', name: 'Карнозавры', detail: 'Обширная клада плотоядных, возникшая в юрском периоде. Включает тираннозавридов, аллозавров.', tip: 'Охотятся на гигантов' },
+      { emoji: '🦎', name: 'Целозавры', detail: 'Небольшие двуногие динозавры, одна из древнейших групп тероподов.' },
+      { emoji: '🐊', name: 'Цератозавры', detail: 'Средние хищники с рогом на носу, длинный гибкий хвост.' },
+      { emoji: '🦈', name: 'Спинозавриды', detail: 'Полуводные хищники, самые крупные плотоядные динозавры.' },
+    ],
+    sauropod: [
+      { emoji: '🦕', name: 'Диплодоциды', detail: 'Самые длинные сухопутные животные в истории, длина до 33 м. Питались листьями.' },
+      { emoji: '🐘', name: 'Брахиозавриды', detail: 'Высокая шея, длинные передние ноги, достигали 13 м в высоту.' },
+      { emoji: '🌿', name: 'Титанозавры', detail: 'Самая разнообразная и многочисленная группа завропод, дожили до конца мела.' },
+    ],
+    unknown: [
+      { emoji: '🤷', name: 'Не знаю вид', detail: 'Наш специалист поможет определить вид при первом контакте.' },
+    ],
   };
 
-  function setTab(btn) {
-    btn.closest('.cat-tabs').querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+  let currentStep = 1;
+  let selectedSubtype = null;
+  let selectedSpecies = null;
+
+  // ─── SUBTYPE ───
+  function selectSubtype(type) {
+    selectedSubtype = type;
+    document.querySelectorAll('.subtype-card').forEach(c => c.className = 'subtype-card');
+    document.getElementById('sub-' + type).classList.add('selected-' + type);
+    document.getElementById('btnNext').disabled = false;
+  }
+
+  // ─── SPECIES ───
+  function buildSpeciesList() {
+    const list = document.getElementById('speciesList');
+    list.innerHTML = '';
+    const items = SPECIES[selectedSubtype] || [];
+    items.forEach((s, i) => {
+      const div = document.createElement('div');
+      div.className = 'species-card';
+      div.innerHTML = `
+        <div class="species-emoji">${s.emoji}</div>
+        <div class="species-info">
+          <div class="species-name">${s.name}</div>
+          <div class="species-detail">${s.detail}</div>
+          ${s.tip ? `<span class="species-tip">${s.tip}</span>` : ''}
+        </div>`;
+      div.onclick = () => {
+        document.querySelectorAll('.species-card').forEach(c => c.classList.remove('selected'));
+        div.classList.add('selected');
+        selectedSpecies = s.name;
+        document.getElementById('btnNext').disabled = false;
+      };
+      list.appendChild(div);
+    });
+  }
+
+  // ─── STEP NAV ───
+  function updateStepUI() {
+    // panels
+    for (let i = 1; i <= 4; i++) {
+      document.getElementById('step' + i).classList.toggle('active', i === currentStep);
+    }
+    // circles
+    for (let i = 1; i <= 4; i++) {
+      const c = document.getElementById('sc' + i);
+      if (!c) continue;
+      c.classList.remove('done', 'active');
+      if (i < currentStep) c.classList.add('done');
+      else if (i === currentStep) c.classList.add('active');
+    }
+    // lines
+    for (let i = 1; i <= 3; i++) {
+      const l = document.getElementById('sl' + i);
+      if (l) l.classList.toggle('done', i < currentStep);
+    }
+    // nav buttons
+    const back = document.getElementById('btnBack');
+    const next = document.getElementById('btnNext');
+    const nav = document.getElementById('stepNav');
+    const bar = document.getElementById('stepsBar');
+
+    if (currentStep === 4) {
+      nav.style.display = 'none';
+      bar.style.display = 'none';
+      document.getElementById('subCard').style.display = 'block';
+    } else {
+      nav.style.display = 'flex';
+      bar.style.display = 'flex';
+      back.style.display = currentStep > 1 ? 'block' : 'none';
+      document.getElementById('spacer').style.display = currentStep > 1 ? 'none' : 'block';
+      next.textContent = currentStep === 3 ? 'Отправить заявку' : 'Далее →';
+    }
+  }
+
+  function nextStep() {
+    if (currentStep === 1) {
+      buildSpeciesList();
+      document.getElementById('btnNext').disabled = true;
+      if (selectedSubtype === 'unknown') {
+        document.getElementById('step2Title').textContent = 'Укажите вид (по возможности)';
+        document.getElementById('step2Sub').textContent = 'Если не знаете — выберите «Не знаю вид» и мы поможем при первом контакте.';
+      } else {
+        document.getElementById('step2Title').textContent = 'Выберите вид динозавра';
+        document.getElementById('step2Sub').textContent = 'Выберите наиболее подходящий вид из списка.';
+      }
+    }
+    if (currentStep === 2) {
+      document.getElementById('btnNext').disabled = false;
+    }
+    if (currentStep === 3) {
+      if (!validateStep3()) return;
+      const num = '#' + Math.floor(100000 + Math.random() * 900000);
+      document.getElementById('caseNumber').textContent = num;
+    }
+    currentStep = Math.min(currentStep + 1, 4);
+    updateStepUI();
+    document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function prevStep() {
+    currentStep = Math.max(currentStep - 1, 1);
+    if (currentStep === 1) document.getElementById('btnNext').disabled = !selectedSubtype;
+    if (currentStep === 2) document.getElementById('btnNext').disabled = !selectedSpecies;
+    updateStepUI();
+  }
+
+  function validateStep3() {
+    const contact = document.getElementById('contact').value.trim();
+    if (!contact) {
+      document.getElementById('contact').focus();
+      document.getElementById('contact').style.borderColor = '#e05c3a';
+      return false;
+    }
+    return true;
+  }
+
+  // ─── SLIDERS ───
+  function syncSlider(rangeId, inputId) {
+    document.getElementById(inputId).value = document.getElementById(rangeId).value;
+  }
+  function syncInput(inputId, rangeId) {
+    document.getElementById(rangeId).value = document.getElementById(inputId).value;
+  }
+
+  // ─── PHOTO ───
+  function handlePhoto(input) {
+    if (input.files && input.files[0]) {
+      const name = input.files[0].name;
+      document.getElementById('photoIcon').textContent = '✅';
+      document.getElementById('photoText').textContent = name;
+      document.getElementById('photoSub').textContent = '';
+    }
+  }
+
+  // ─── CHAR COUNT ───
+  function updateCharCount() {
+    const len = document.getElementById('description').value.length;
+    document.getElementById('charCount').textContent = len + '/1000';
+  }
+
+  // ─── HELP TOGGLE ───
+  function toggleHelp(id) {
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  }
+
+  // ─── PLANS & AMOUNTS ───
+  function selectPlan(plan) {
+    document.getElementById('plan-month').classList.toggle('active', plan === 'month');
+    document.getElementById('plan-year').classList.toggle('active', plan === 'year');
+  }
+  function selectAmount(btn) {
+    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
   }
-  function setDonTab(btn) {
-    btn.closest('.donation-tabs').querySelectorAll('.donation-tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
-  function updateDino() {
-    const sel = document.getElementById('dinoType');
-    document.getElementById('dinoImg').textContent = dinoEmojis[sel.value] || '🦖';
-  }
-  function updateAmount(radio) {
-    document.getElementById('customAmount').classList.toggle('visible', radio.value === 'custom');
-  }
-  function clearForm() {
-    document.querySelector('.order-input').value = '';
-  }
-  document.getElementById('t1').addEventListener('change', function() {
-    if (this.checked) document.getElementById('t2').checked = false;
-  });
-  document.getElementById('t2').addEventListener('change', function() {
-    if (this.checked) document.getElementById('t1').checked = false;
+
+  // ─── CONTACT FIELD ───
+  document.getElementById('contact').addEventListener('input', function() {
+    this.style.borderColor = '';
+    document.getElementById('btnNext').disabled = false;
   });
 </script>
 </body>
